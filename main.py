@@ -244,6 +244,9 @@ async def on_guild_remove(guild):
 @app_commands.describe(name="Server ka display name jaise BloodSMP", ip="Server IP", port="Server Port")
 async def setup(interaction: discord.Interaction, name: str, ip: str, port: int):
     try:
+        # YE 2 LINE YAHAN CHIPKA DE - SABSE UPAR
+        name = name.lower().strip()
+        name = name.replace(" ", "-")
         await interaction.response.defer(ephemeral=True)
         if not interaction.channel.permissions_for(interaction.guild.me).send_messages:
             await interaction.followup.send("❌ I need 'Send Messages' permission in this channel!", ephemeral=True)
