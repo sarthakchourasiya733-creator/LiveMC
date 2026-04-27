@@ -471,6 +471,5 @@ async def resetstats(interaction: discord.Interaction, server: str):
         print(f"Reset Error: {e}")
 
 if __name__ == "__main__":
-    # keep_alive() # Pydroid me comment rakho, Render pe uncomment karna
-keep_alive()
-    bot.run(BOT_TOKEN)
+    keep_alive()  # ✅ 4 space aage kar de
+    bot.run(BOT_TOKEN)  # ✅ 4 space aage kar de
