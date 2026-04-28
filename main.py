@@ -241,20 +241,21 @@ async def on_guild_remove(guild):
 
 # UPDATED: AB CUSTOM NAME WALA SETUP
 @bot.tree.command(name="setup", description="Add a Minecraft server to track")
-@app_commands.describe(name="Server ka display name jaise BloodSMP", ip="Server IP", port="Server Port")
+@app_commands.describe(name="Server identifier - Use IP:PORT format", ip="Server IP", port="Server Port")
 async def setup(interaction: discord.Interaction, name: str, ip: str, port: int):
     try:
-        # YE 2 LINE YAHAN CHIPKA DE - SABSE UPAR
         name = name.lower().strip()
         name = name.replace(" ", "-")
+
         await interaction.response.defer(ephemeral=True)
+
         if not interaction.channel.permissions_for(interaction.guild.me).send_messages:
-            await interaction.followup.send("❌ I need 'Send Messages' permission in this channel!", ephemeral=True)
+            await interaction.followup.send("❌ I need 'Send Messages' permission in this channel", ephemeral=True)
             return
 
         result = await safe_mcping(ip, port)
         if result[0] is None:
-            await interaction.followup.send("❌ Invalid IP/Port or server is offline! Server Java/Bedrock dono me nahi mila.", ephemeral=True)
+            await interaction.followup.send("❌ Invalid IP/Port or server is offline", ephemeral=True)
             return
 
         status, is_bedrock = result
@@ -262,16 +263,20 @@ async def setup(interaction: discord.Interaction, name: str, ip: str, port: int)
 
         guild_id = str(interaction.guild.id)
         server_key = f"{ip}:{port}"
-        if guild_id not in servers_data: servers_data[guild_id] = {}
+
+        if guild_id not in servers_data:
+            servers_data[guild_id] = {}
+
         if len(servers_data[guild_id]) >= 10:
-            await interaction.followup.send("❌ Maximum 10 servers per Discord for free tier!", ephemeral=True)
+            await interaction.followup.send("❌ Maximum 10 servers per Discord for free tier", ephemeral=True)
             return
 
-        temp_data = {"ip": ip, "port": port, "is_bedrock": is_bedrock, "color": 0x00ffc6, "footer": "LiveMC | Free Server Tracker • Auto-Update", "custom_name": name}
+        temp_data = {"ip": ip, "port": port, "is_bedrock": is_bedrock, "color": 0x00ff6c, "footer": "LiveMC | Free Server Tracker"}
         embed = create_embed(server_key, status, temp_data)
         view = LiveMCView(ip, port, server_key)
 
         msg = await interaction.channel.send(embed=embed, view=view)
+
         servers_data[guild_id][server_key] = {
             "ip": ip,
             "port": port,
@@ -279,14 +284,20 @@ async def setup(interaction: discord.Interaction, name: str, ip: str, port: int)
             "channel_id": interaction.channel.id,
             "message_id": msg.id,
             "was_online": True,
-            "color": 0x00ffc6,
+            "color": 0x00ff6c,
             "footer": "LiveMC | Free Server Tracker • Auto-Update",
             "custom_name": name
         }
-        save_data(servers_data)
-        await interaction.followup.send(f"✅ **{name}** ({edition_name} Edition) added successfully!", ephemeral=True)
-    except discord.errors.NotFound:
-        print("Interaction expired - user took too long")
+
+        # save_data(servers_data) # <- Comment rakha hai, jab function banayega tab uncomment karna
+
+        await interaction.followup.send(f"✅ Server `{server_key}` setup complete!")
+
+    except Exception as e: # <- YE SABSE ZARURI FIX HAI
+        print(f"SETUP ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        await interaction.followup.send(f"❌ An error occurred: `{str(e)}`")
     except Exception as e:
         print(f"Setup Error: {e}")
         try:
