@@ -37,7 +37,25 @@ mongo_client = MongoClient(MONGO_URI)
 db = mongo_client["LiveMC"]
 servers_collection = db["servers"]
 print("MongoDB Connected ✅")
+class MongoDict:
+    def __getitem__(self, key):
+        data = servers_collection.find_one({"guild_id": str(key)})
+        return data.get("servers", {}) if data else {}
 
+    def __setitem__(self, key, value):
+        servers_collection.update_one(
+            {"guild_id": str(key)},
+            {"$set": {"servers": value}},
+            upsert=True
+        )
+
+    def get(self, key, default=None):
+        return self[key] or default
+
+servers_data = MongoDict()
+
+def save_data(data):
+    pass # Kuch nahi karna, auto-save ho jata hai
 
 async def safe_mcping(ip, port):
     try:
