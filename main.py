@@ -298,12 +298,7 @@ async def setup(interaction: discord.Interaction, name: str, ip: str, port: int)
         import traceback
         traceback.print_exc()
         await interaction.followup.send(f"❌ An error occurred: `{str(e)}`")
-    except Exception as e:
-        print(f"Setup Error: {e}")
-        try:
-            await interaction.followup.send("❌ An unexpected error occurred! Try again.", ephemeral=True)
-        except:
-            pass
+
 
 @bot.tree.command(name="listservers", description="List all tracked servers in this Discord")
 async def listservers(interaction: discord.Interaction):
