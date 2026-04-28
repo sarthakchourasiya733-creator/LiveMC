@@ -8,6 +8,7 @@ from mcstatus import JavaServer, BedrockServer
 from datetime import datetime
 from flask import Flask
 from threading import Thread
+from pymongo import MongoClient
 
 app = Flask('')
 
@@ -24,26 +25,19 @@ def keep_alive():
 
 # ========== CONFIG ==========
 BOT_TOKEN = os.getenv("TOKEN") # <-- NAYA TOKEN DAALNA BHAI
+MONGO_URI = os.getenv("MONGO_URI")
 UPDATE_INTERVAL = 30
-DATA_FILE = "servers.json"
 # ============================
 
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-def load_data():
-    if not os.path.exists(DATA_FILE):
-        with open(DATA_FILE, 'w') as f:
-            json.dump({}, f)
-    with open(DATA_FILE, 'r') as f:
-        return json.load(f)
+mongo_client = MongoClient(MONGO_URI)
+db = mongo_client["LiveMC"]
+servers_collection = db["servers"]
+print("MongoDB Connected ✅")
 
-def save_data(data):
-    with open(DATA_FILE, 'w') as f:
-        json.dump(data, f, indent=4)
-
-servers_data = load_data()
 
 async def safe_mcping(ip, port):
     try:
