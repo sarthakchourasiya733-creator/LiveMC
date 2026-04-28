@@ -478,7 +478,49 @@ async def resetstats(interaction: discord.Interaction, server: str):
         await interaction.followup.send(f"✅ Statistics reset for **{server}**!", ephemeral=True)
     except Exception as e:
         print(f"Reset Error: {e}")
-
+@bot.tree.command(name="help", description="LiveMC ke sabhi commands")
+async def help_cmd(interaction: discord.Interaction):
+    
+    embed = discord.Embed(
+        title="🟢 LiveMC • Command Panel",
+        description="**Best Minecraft Server Tracker for Discord**\n`24/7 Monitoring • Auto-Update • Java & Bedrock`",
+        color=0x57F287
+    )
+    
+    embed.add_field(
+        name="🚀 **Setup Commands**",
+        value="```\n/setup ip:port\n└ Server add karo tracking ke liye\n└ Example: /setup ip:play.hypixel.net\n```",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="📡 **Tracking Commands**",
+        value="```\n/players     - Live player list\n/listservers - Tracked servers dekho\n```",
+        inline=True
+    )
+    
+    embed.add_field(
+        name="⚙️ **Manage Commands**",
+        value="```\n/setchannel   - Panel move karo\n/forceupdate  - Refresh karo\n/removeserver - Server hatao\n/resetstats   - Stats reset\n```",
+        inline=True
+    )
+    
+    embed.add_field(
+        name="🔔 **Alert Command**",
+        value="```\n/setalertrole server @role\n└ Server offline hone pe ping\n```",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="📊 **Bot Info**",
+        value=f"```\nGuilds: {len(bot.guilds)}\nPing: {round(bot.latency * 1000)}ms\nVersion: v2.5\n```",
+        inline=False
+    )
+    
+    embed.set_thumbnail(url=bot.user.display_avatar.url)
+    embed.set_footer(text="LiveMC • Start with /setup")
+    
+    await interaction.response.send_message(embed=embed)
 if __name__ == "__main__":
     keep_alive()  # ✅ 4 space aage kar de
     bot.run(BOT_TOKEN)  # ✅ 4 space aage kar de
