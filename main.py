@@ -522,5 +522,6 @@ async def help_cmd(interaction: discord.Interaction):
     
     await interaction.response.send_message(embed=embed)
 if __name__ == "__main__":
-    keep_alive()  # ✅ 4 space aage kar de
-    bot.run(BOT_TOKEN)  # ✅ 4 space aage kar de
+    if __name__ == "__main__":
+    keep_alive()
+    bot.run(BOT_TOKEN)
