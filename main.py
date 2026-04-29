@@ -8,7 +8,7 @@ from mcstatus import JavaServer, BedrockServer
 from datetime import datetime
 from flask import Flask
 from threading import Thread
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 
 app = Flask('')
 
@@ -33,31 +33,29 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-mongo_client = MongoClient(MONGO_URI)
+mongo_client = AsyncIOMotorClient(MONGO_URI, serverSelectionTimeoutMS=5000)
 db = mongo_client["LiveMC"]
 servers_collection = db["servers"]
 print("MongoDB Connected ✅")
 class MongoDict:
-    def __getitem__(self, key):
-        data = servers_collection.find_one({"guild_id": str(key)})
+    async def get(self, guild_id):
+        data = await servers_collection.find_one({"guild_id": str(guild_id)})
         return data.get("servers", {}) if data else {}
-
-    def __setitem__(self, key, value):
-        servers_collection.update_one(
-            {"guild_id": str(key)},
+    
+    async def set(self, guild_id, value):
+        await servers_collection.update_one(
+            {"guild_id": str(guild_id)},
             {"$set": {"servers": value}},
             upsert=True
         )
-
-    def get(self, key, default=None):
-        return self[key] or default
-
-    def items(self):
+    
+    async def items(self):
         all_data = servers_collection.find({})
         result = []
-        for doc in all_data:
+        async for doc in all_data:
             result.append((doc["guild_id"], doc.get("servers", {})))
         return result
+
 servers_data = MongoDict()
 
 def save_data(data):
