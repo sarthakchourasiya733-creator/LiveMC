@@ -52,6 +52,12 @@ class MongoDict:
     def get(self, key, default=None):
         return self[key] or default
 
+    def items(self):
+        all_data = servers_collection.find({})
+        result = []
+        for doc in all_data:
+            result.append((doc["guild_id"], doc.get("servers", {})))
+        return result
 servers_data = MongoDict()
 
 def save_data(data):
