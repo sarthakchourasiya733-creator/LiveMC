@@ -71,7 +71,8 @@ class MongoDict:
             asyncio.create_task(servers_collection.delete_one({"guild_id": str(guild_id)}))
 
 servers_data = MongoDict()
-
+# PURANI save_data CALLS KO IGNORE KARNE KE LIYE  
+def save_data(data): pass
 async def safe_mcping(ip, port):
     try:
         async with asyncio.timeout(5):
