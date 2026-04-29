@@ -38,28 +38,39 @@ db = mongo_client["LiveMC"]
 servers_collection = db["servers"]
 print("MongoDB Connected ✅")
 class MongoDict:
-    async def get(self, guild_id):
-        data = await servers_collection.find_one({"guild_id": str(guild_id)})
-        return data.get("servers", {}) if data else {}
+    def __init__(self):
+        self.cache = {}
     
-    async def set(self, guild_id, value):
+    async def load_all(self):
+        async for doc in servers_collection.find({}):
+            self.cache[doc["guild_id"]] = doc.get("servers", {})
+    
+    def __getitem__(self, guild_id):
+        return self.cache.get(str(guild_id), {})
+    
+    def __setitem__(self, guild_id, value):
+        self.cache[str(guild_id)] = value
+        asyncio.create_task(self._save(str(guild_id)))
+    
+    async def _save(self, guild_id):
         await servers_collection.update_one(
-            {"guild_id": str(guild_id)},
-            {"$set": {"servers": value}},
+            {"guild_id": guild_id},
+            {"$set": {"servers": self.cache[guild_id]}},
             upsert=True
         )
     
-    async def items(self):
-        all_data = servers_collection.find({})
-        result = []
-        async for doc in all_data:
-            result.append((doc["guild_id"], doc.get("servers", {})))
-        return result
+    def __contains__(self, guild_id):
+        return str(guild_id) in self.cache
+    
+    def items(self):
+        return self.cache.items()
+    
+    def __delitem__(self, guild_id):
+        if str(guild_id) in self.cache:
+            del self.cache[str(guild_id)]
+            asyncio.create_task(servers_collection.delete_one({"guild_id": str(guild_id)}))
 
 servers_data = MongoDict()
-
-def save_data(data):
-    pass # Kuch nahi karna, auto-save ho jata hai
 
 async def safe_mcping(ip, port):
     try:
