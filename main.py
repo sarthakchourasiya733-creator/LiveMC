@@ -247,7 +247,8 @@ async def track_uptime():
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
-        # FIXED: BUTTONS KO PERSISTENT BANAO
+    await servers_data.load_all()  # ← YE NAYI LINE
+    # FIXED: BUTTONS KO PERSISTENT BANAO
     for guild_id, servers in servers_data.items():
         for server_name, data in servers.items():
             bot.add_view(LiveMCView(data['ip'], data['port'], server_name))
