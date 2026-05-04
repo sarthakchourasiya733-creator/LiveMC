@@ -26,7 +26,7 @@ def keep_alive():
 # ========== CONFIG ==========
 BOT_TOKEN = os.getenv("TOKEN") # <-- NAYA TOKEN DAALNA BHAI
 MONGO_URI = os.getenv("MONGO_URI")
-UPDATE_INTERVAL = 30
+UPDATE_INTERVAL = 120
 # ============================
 
 intents = discord.Intents.default()
@@ -225,7 +225,7 @@ async def update_server_panel(guild_id, server_name, data):
     except Exception as e:
         print(f"Update Error: {e}")
 
-@tasks.loop(seconds=60)
+@tasks.loop(seconds=120)
 async def track_uptime():
     for guild_id, servers in servers_data.items():
         for server_name, data in servers.items():
