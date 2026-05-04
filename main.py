@@ -550,6 +550,14 @@ async def help_cmd(interaction: discord.Interaction):
     embed.set_footer(text="LiveMC • Start with /setup")
     
     await interaction.response.send_message(embed=embed)
+
+@bot.event
+async def on_ready():
+    print(f'✅ {bot.user} is online!')
+    update_all_servers.start()
+    track_uptime.start()
+    print("✅ Auto-update started! 2 min")
+    
 if __name__ == "__main__":
     keep_alive()
     bot.run(BOT_TOKEN)
